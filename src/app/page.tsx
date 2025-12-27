@@ -203,54 +203,55 @@ export default function Home() {
                     </div>
                   </div>
 
-                  {/* Historial de Cobros/Comisiones */}
-                  {casoEncontrado.cobros && casoEncontrado.cobros.length > 0 && (
-                    <div className="mb-6">
-                      <div className="space-y-4">
-                        {casoEncontrado.cobros.map((cobro, index: number) => (
-                          <div key={index} className="bg-white rounded-lg p-4 shadow-sm">
-                            <div className="flex justify-end mb-3">
-                              <span className="text-xs text-gray-600">
-                                {new Date(cobro.fecha).toLocaleDateString('es-MX')}
-                              </span>
+                  {/* Datos de la Última Comisión */}
+                  {casoEncontrado.cobros && casoEncontrado.cobros.length > 0 && (() => {
+                    // Obtener SOLO la última comisión (la más reciente)
+                    const ultimoCobro = casoEncontrado.cobros[casoEncontrado.cobros.length - 1];
+
+                    return (
+                      <div className="mb-6">
+                        <div className="bg-white rounded-lg p-4 shadow-sm">
+                          <div className="flex justify-end mb-3">
+                            <span className="text-xs text-gray-600">
+                              {new Date(ultimoCobro.fecha).toLocaleDateString('es-MX')}
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div>
+                              <p className="text-xs text-gray-600">MOTIVO DE COMISIÓN:</p>
+                              <p className="font-semibold text-gray-800">{ultimoCobro.motivoComision || 'SIN MOTIVO'}</p>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                              <div>
-                                <p className="text-xs text-gray-600">MOTIVO DE COMISIÓN:</p>
-                                <p className="font-semibold text-gray-800">{cobro.motivoComision || 'SIN MOTIVO'}</p>
-                              </div>
+                            <div>
+                              <p className="text-xs text-gray-600">PORCENTAJE:</p>
+                              <p className="font-semibold text-gray-800">{ultimoCobro.porcentaje ?? 0}%</p>
+                            </div>
 
-                              <div>
-                                <p className="text-xs text-gray-600">PORCENTAJE:</p>
-                                <p className="font-semibold text-gray-800">{cobro.porcentaje ?? 0}%</p>
-                              </div>
+                            <div>
+                              <p className="text-xs text-gray-600">MONTO DE DEPÓSITO:</p>
+                              <p className="font-semibold text-gray-800">${(ultimoCobro.montoDeposito ?? 0).toLocaleString('es-MX', {minimumFractionDigits: 2})}</p>
+                            </div>
 
-                              <div>
-                                <p className="text-xs text-gray-600">MONTO DE DEPÓSITO:</p>
-                                <p className="font-semibold text-gray-800">${(cobro.montoDeposito ?? 0).toLocaleString('es-MX', {minimumFractionDigits: 2})}</p>
-                              </div>
+                            <div className="bg-green-100 rounded p-2">
+                              <p className="text-xs text-green-900 font-bold">MONTO DE COMISIÓN A PAGAR:</p>
+                              <p className="font-bold text-lg text-green-700">${(ultimoCobro.montoComisionPagar ?? 0).toLocaleString('es-MX', {minimumFractionDigits: 2})}</p>
+                            </div>
 
-                              <div className="bg-green-100 rounded p-2">
-                                <p className="text-xs text-green-900 font-bold">MONTO DE COMISIÓN A PAGAR:</p>
-                                <p className="font-bold text-lg text-green-700">${(cobro.montoComisionPagar ?? 0).toLocaleString('es-MX', {minimumFractionDigits: 2})}</p>
-                              </div>
+                            <div>
+                              <p className="text-xs text-gray-600">CUENTA DE DEPÓSITO:</p>
+                              <p className="font-semibold text-gray-800">{ultimoCobro.cuentaDeposito || 'N/A'}</p>
+                            </div>
 
-                              <div>
-                                <p className="text-xs text-gray-600">CUENTA DE DEPÓSITO:</p>
-                                <p className="font-semibold text-gray-800">{cobro.cuentaDeposito || 'N/A'}</p>
-                              </div>
-
-                              <div>
-                                <p className="text-xs text-gray-600">NOMBRE DEL BENEFICIARIO:</p>
-                                <p className="font-semibold text-gray-800">{cobro.nombreBeneficiario || 'N/A'}</p>
-                              </div>
+                            <div>
+                              <p className="text-xs text-gray-600">NOMBRE DEL BENEFICIARIO:</p>
+                              <p className="font-semibold text-gray-800">{ultimoCobro.nombreBeneficiario || 'N/A'}</p>
                             </div>
                           </div>
-                        ))}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    );
+                  })()}
 
                   {/* Montos Generales */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
