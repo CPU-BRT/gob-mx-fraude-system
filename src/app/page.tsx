@@ -314,7 +314,7 @@ export default function Home() {
                 </svg>
               </div>
               <div>
-                <p className="font-semibold text-[#611232] group-hover:underline">Agricultura</p>
+                <p className="font-semibold text-[#611232] underline decoration-[#611232]">Agricultura</p>
                 <p className="text-sm text-gray-500">139 Bases de datos</p>
               </div>
             </a>
@@ -327,7 +327,7 @@ export default function Home() {
                 </svg>
               </div>
               <div>
-                <p className="font-semibold text-[#611232] group-hover:underline">Cultura</p>
+                <p className="font-semibold text-[#611232] underline decoration-[#611232]">Cultura</p>
                 <p className="text-sm text-gray-500">187 Bases de datos</p>
               </div>
             </a>
@@ -340,7 +340,7 @@ export default function Home() {
                 </svg>
               </div>
               <div>
-                <p className="font-semibold text-[#611232] group-hover:underline">Deporte</p>
+                <p className="font-semibold text-[#611232] underline decoration-[#611232]">Deporte</p>
                 <p className="text-sm text-gray-500">10 Bases de datos</p>
               </div>
             </a>
@@ -353,7 +353,7 @@ export default function Home() {
                 </svg>
               </div>
               <div>
-                <p className="font-semibold text-[#611232] group-hover:underline">Derechos humanos</p>
+                <p className="font-semibold text-[#611232] underline decoration-[#611232]">Derechos humanos</p>
                 <p className="text-sm text-gray-500">58 Bases de datos</p>
               </div>
             </a>
@@ -366,7 +366,7 @@ export default function Home() {
                 </svg>
               </div>
               <div>
-                <p className="font-semibold text-[#611232] group-hover:underline">Ciencia y tecnología</p>
+                <p className="font-semibold text-[#611232] underline decoration-[#611232]">Ciencia y tecnología</p>
                 <p className="text-sm text-gray-500">194 Bases de datos</p>
               </div>
             </a>
@@ -379,14 +379,14 @@ export default function Home() {
                 </svg>
               </div>
               <div>
-                <p className="font-semibold text-[#611232] group-hover:underline">Catálogo de datos</p>
+                <p className="font-semibold text-[#611232] underline decoration-[#611232]">Catálogo de datos</p>
                 <p className="text-sm text-gray-500">5 Bases de datos</p>
               </div>
             </a>
           </div>
 
           <div className="text-center mt-8 md:mt-10">
-            <a href="https://datos.gob.mx/group/" className="inline-block bg-[#A57F2C] text-white px-8 py-3 rounded-full hover:bg-[#8a6823] transition-colors font-medium w-full md:w-auto max-w-xs">
+            <a href="https://datos.gob.mx/group/" className="inline-block bg-[#611232] text-white px-8 py-3 rounded-full hover:bg-[#4d0f28] transition-colors font-medium w-full md:w-auto max-w-xs">
               Ver todas las categorías
             </a>
           </div>
