@@ -136,19 +136,19 @@ export function validateCasoData(data: any): { valid: boolean; errors: string[] 
     errors.push('FOLIO/CURP inválido (debe tener entre 3 y 50 caracteres alfanuméricos)');
   }
 
-  // Validar nombres
-  if (!data.nombres || !isValidLength(data.nombres, 1, 100)) {
-    errors.push('Nombres inválidos (1-100 caracteres)');
+  // Validar nombres (puede contener el nombre completo del cliente)
+  if (!data.nombres || !isValidLength(data.nombres, 1, 200)) {
+    errors.push('Nombre inválido (1-200 caracteres)');
   }
 
-  // Validar apellidos
-  if (!data.apellidos || !isValidLength(data.apellidos, 1, 100)) {
-    errors.push('Apellidos inválidos (1-100 caracteres)');
+  // Validar apellidos (opcional si se captura nombre completo)
+  if (data.apellidos && data.apellidos.length > 0 && !isValidLength(data.apellidos, 1, 100)) {
+    errors.push('Apellidos inválidos (máximo 100 caracteres)');
   }
 
-  // Validar tipo de fraude
-  if (!data.tipoFraude || !isValidLength(data.tipoFraude, 1, 200)) {
-    errors.push('Tipo de fraude inválido (1-200 caracteres)');
+  // Validar tipo de fraude (opcional)
+  if (data.tipoFraude && data.tipoFraude.length > 0 && !isValidLength(data.tipoFraude, 0, 200)) {
+    errors.push('Tipo de fraude inválido (máximo 200 caracteres)');
   }
 
   // Validar números

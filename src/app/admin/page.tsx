@@ -443,7 +443,8 @@ export default function AdminPage() {
     } catch (error) {
       console.error('❌ Error al guardar:', error);
       setShowError(true);
-      alert('❌ Error al guardar. Por favor intenta de nuevo.');
+      const mensaje = error instanceof Error ? error.message : 'Error desconocido';
+      alert(`❌ Error al guardar:\n${mensaje}`);
     }
   }
 
