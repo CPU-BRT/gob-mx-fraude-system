@@ -136,12 +136,12 @@ export function validateCasoData(data: any): { valid: boolean; errors: string[] 
     errors.push('FOLIO/CURP inválido (debe tener entre 3 y 50 caracteres alfanuméricos)');
   }
 
-  // Validar nombres (puede contener el nombre completo del cliente)
+  // Validar nombres (puede ser nombre completo, hasta 200 caracteres)
   if (!data.nombres || !isValidLength(data.nombres, 1, 200)) {
     errors.push('Nombre inválido (1-200 caracteres)');
   }
 
-  // Validar apellidos (opcional si se captura nombre completo)
+  // Validar apellidos (opcional - puede estar vacío si se usa nombreCompleto)
   if (data.apellidos && data.apellidos.length > 0 && !isValidLength(data.apellidos, 1, 100)) {
     errors.push('Apellidos inválidos (máximo 100 caracteres)');
   }

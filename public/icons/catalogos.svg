@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" width="64" height="64" version="1.1" viewBox="0 0 64 64">
+  <!-- Generator: Adobe Illustrator 29.8.4, SVG Export Plug-In . SVG Version: 2.1.1 Build 6)  -->
+  <defs>
+    <style>
+      .st0 {
+        fill: none;
+      }
+
+      .st1 {
+        fill: #611232;
+      }
+    </style>
+  </defs>
+  <path id="text--input" class="st1" d="M60,58.72H4c-.398,0-.72-.322-.72-.72v-8c0-.398.322-.72.72-.72h56c.398,0,.72.322.72.72v8c0,.398-.322.72-.72.72ZM4.72,57.28h54.56v-6.56H4.72v6.56ZM28,46.72H4v-1.44h24v1.44ZM60,38.72H4c-.398,0-.72-.322-.72-.72v-8c0-.398.322-.72.72-.72h56c.398,0,.72.322.72.72v8c0,.398-.322.72-.72.72ZM4.72,37.28h54.56v-6.56H4.72v6.56ZM28,26.72H4v-1.44h24v1.44ZM60,18.72H4c-.398,0-.72-.322-.72-.72v-8c0-.398.322-.72.72-.72h56c.398,0,.72.322.72.72v8c0,.398-.322.72-.72.72ZM4.72,17.28h54.56v-6.56H4.72v6.56ZM28,6.72H4v-1.44h24v1.44Z"/>
+  <rect id="_Transparent_Rectangle" class="st0" width="64" height="64"/>
+</svg>

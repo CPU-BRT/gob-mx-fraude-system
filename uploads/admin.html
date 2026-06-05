@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Admin gob.mx">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#611232">
+    <meta name="msapplication-TileColor" content="#611232">
+    <title>Administración - Registro de Casos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <!-- styles.css se carga desde el proyecto principal si existe -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans', 'Inter', 'Montserrat', Arial, sans-serif;
+            background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* Header mejorado - Estilo gob.mx exacto */
+        .header-vino {
+            background-color: #611232 !important;
+            width: 100% !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            min-height: 100px;
+        }
+
+        .header-container {
+            max-width: 1280px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 15px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-logos-center {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            flex: 0 0 auto;
+        }
+
+        .header-logos-center a {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .header-logos-center img {
+            height: 72px;
+            width: auto;
+            max-width: 200px;
+            object-fit: contain;
+        }
+
+        .header-links {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+            flex: 0 0 auto;
+            justify-content: flex-end;
+        }
+
+        .header-link {
+            color: #fff !important;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            padding: 0 10px;
+            line-height: 22px;
+            transition: all 0.3s;
+            font-family: 'Noto Sans', sans-serif !important;
+            white-space: nowrap;
+        }
+
+        .header-link:hover {
+            text-decoration: underline !important;
+            text-decoration-color: white !important;
+            text-decoration-thickness: 2px !important;
+        }
+
+        .header-link.active {
+            border-bottom: 2px solid white;
+            padding-bottom: 2px;
+        }
+
+        /* Contenedor principal */
+        .main-content {
+            padding: 40px 20px;
+            min-height: calc(100vh - 88px);
+        }
+
+        .admin-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .admin-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 24px;
+            border-bottom: 3px solid #611232;
+        }
+
+        .admin-header h1 {
+            color: #611232;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .admin-header p {
+            color: #666;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        /* Folio display mejorado */
+        .folio-display {
+            background: linear-gradient(135deg, #611232 0%, #8B2446 100%);
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(97, 18, 50, 0.3);
+        }
+
+        .folio-display label {
+            display: block;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .folio-display strong {
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        /* Formulario mejorado */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #333;
+            font-size: 15px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: 'Noto Sans', Arial, sans-serif;
+            box-sizing: border-box;
+            transition: all 0.3s;
+            background: #fafafa;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #611232;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(97, 18, 50, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* Botón mejorado */
+        .btn-submit {
+            width: 100%;
+            background: linear-gradient(135deg, #611232 0%, #8B2446 100%);
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 30px;
+            box-shadow: 0 4px 12px rgba(97, 18, 50, 0.3);
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(97, 18, 50, 0.4);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        .btn-submit:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Mensajes mejorados */
+        .success-message {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            color: #155724;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 24px;
+            text-align: center;
+            display: none;
+            border-left: 4px solid #28a745;
+            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.2);
+            position: relative;
+        }
+
+        .success-message .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: transparent;
+            border: none;
+            color: #155724;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+            line-height: 1;
+        }
+
+        .success-message .close-btn:hover {
+            background: rgba(21, 87, 36, 0.1);
+            transform: scale(1.1);
+        }
+
+        .success-message .folio-destacado {
+            font-size: 22px;
+            font-weight: 700;
+            color: #155724;
+            background: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            display: inline-block;
+            margin: 10px 0;
+            border: 2px solid #28a745;
+            letter-spacing: 1px;
+            cursor: pointer;
+            user-select: all;
+            transition: all 0.3s;
+        }
+
+        .success-message .folio-destacado:hover {
+            background: #f0f0f0;
+            transform: scale(1.02);
+        }
+
+        .success-message .folio-destacado:active {
+            background: #e0e0e0;
+        }
+
+        .error-message {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            color: #721c24;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 24px;
+            text-align: center;
+            display: none;
+            border-left: 4px solid #dc3545;
+            box-shadow: 0 2px 8px rgba(220, 53, 69, 0.2);
+        }
+
+        /* Modal para cliente duplicado */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-cliente-duplicado {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            position: relative;
+            animation: modalFadeIn 0.3s ease-out;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: transparent;
+            border: none;
+            color: #611232;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+            line-height: 1;
+        }
+
+        .modal-close-btn:hover {
+            background: rgba(97, 18, 50, 0.1);
+            transform: scale(1.1);
+        }
+
+        .modal-titulo {
+            color: #611232;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+            padding-right: 30px;
+        }
+
+        .modal-info-item {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #611232;
+        }
+
+        .modal-info-label {
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .modal-info-value {
+            color: #611232;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .modal-folio-destacado {
+            font-size: 22px;
+            font-weight: 700;
+            color: #611232;
+            background: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            display: inline-block;
+            border: 2px solid #611232;
+            letter-spacing: 1px;
+            cursor: pointer;
+            user-select: all;
+            transition: all 0.3s;
+            width: 100%;
+            text-align: center;
+            margin-top: 5px;
+        }
+
+        .modal-folio-destacado:hover {
+            background: #f0f0f0;
+            transform: scale(1.02);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .header-container {
+                padding: 12px 16px;
+                flex-wrap: wrap;
+            }
+
+            .header-logos-center img {
+                height: 60px;
+                max-width: 150px;
+            }
+
+            .header-links {
+                gap: 16px;
+            }
+
+            .header-link {
+                font-size: 14px;
+                padding: 0 8px;
+            }
+
+            .admin-container {
+                padding: 20px 16px;
+            }
+
+            .form-row {
+                flex-direction: column;
+            }
+
+            .form-group {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-vino {
+                min-height: 80px;
+            }
+
+            .header-container {
+                padding: 10px 12px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .header-logos-center {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .header-logos-center img {
+                height: 50px;
+                max-width: 120px;
+            }
+
+            .header-links {
+                width: 100%;
+                justify-content: flex-start;
+                gap: 12px;
+            }
+
+            .header-link {
+                font-size: 14px;
+                padding: 6px 8px;
+            }
+
+            .admin-container {
+                padding: 16px;
+                margin: 10px;
+            }
+
+            .admin-header h1 {
+                font-size: 22px;
+            }
+
+            .admin-header p {
+                font-size: 14px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .form-group label {
+                font-size: 13px;
+            }
+
+            .form-group input,
+            .form-group textarea {
+                font-size: 14px;
+                padding: 10px;
+            }
+
+            .btn-submit {
+                padding: 12px 24px;
+                font-size: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-logos-center img {
+                height: 40px;
+                max-width: 100px;
+            }
+
+            .admin-header h1 {
+                font-size: 20px;
+            }
+
+            .folio-display {
+                padding: 12px;
+                font-size: 13px;
+            }
+            
+            /* Asegurar que los inputs sean táctiles */
+            .form-group input,
+            .form-group textarea,
+            .form-group select {
+                font-size: 16px !important;
+                min-height: 44px;
+                padding: 12px;
+            }
+            
+            .btn-submit {
+                min-height: 48px;
+                font-size: 16px;
+                padding: 14px 28px;
+            }
+        }
+
+        /* Orientación landscape en móviles */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .header-vino {
+                min-height: 70px;
+            }
+            
+            .header-logos-center img {
+                height: 45px;
+            }
+            
+            .admin-container {
+                padding: 20px 16px;
+            }
+        }
+
+        /* Estilos específicos para iOS */
+        @supports (-webkit-touch-callout: none) {
+            input, textarea, select {
+                font-size: 16px !important;
+                -webkit-appearance: none;
+            }
+            
+            button, .btn-submit {
+                -webkit-appearance: none;
+                -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+            }
+        }
+
+        /* Estilos específicos para Android */
+        @supports not (-webkit-touch-callout: none) {
+            body {
+                -webkit-font-smoothing: antialiased;
+                text-rendering: optimizeLegibility;
+            }
+        }
+
+        /* Mejorar área táctil en dispositivos móviles */
+        @media (hover: none) and (pointer: coarse) {
+            button,
+            .btn-submit,
+            a,
+            input[type="submit"],
+            input[type="button"] {
+                min-height: 44px;
+                min-width: 44px;
+            }
+            
+            .form-group input,
+            .form-group textarea {
+                min-height: 44px;
+            }
+        }
+
+        /* Animaciones */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .admin-container {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        /* Instrucciones del sistema */
+        .instrucciones-sistema {
+            background: linear-gradient(135deg, #611232 0%, #8B2446 100%);
+            width: 100%;
+            padding: 40px 20px;
+            margin-top: 60px;
+            color: white;
+        }
+
+        .instrucciones-container {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .instrucciones-titulo {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .instrucciones-contenido {
+            font-size: 16px;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.95);
+            text-align: justify;
+        }
+
+        .instrucciones-contenido ul {
+            list-style: none;
+            padding-left: 0;
+            margin: 20px 0;
+        }
+
+        .instrucciones-contenido li {
+            margin: 12px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .instrucciones-contenido li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #FFD700;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .instrucciones-contenido strong {
+            color: #FFD700;
+            font-weight: 600;
+        }
+
+        /* Footer - Franja café con logotipo */
+        .footer-franja {
+            background-color: #8B4513;
+            width: 100%;
+            padding: 30px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+        }
+
+        .footer-container {
+            max-width: 1280px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .footer-logo {
+            height: 80px;
+            width: auto;
+            max-width: 300px;
+            object-fit: contain;
+        }
+
+        @media (max-width: 768px) {
+            .instrucciones-sistema {
+                padding: 30px 15px;
+            }
+
+            .instrucciones-titulo {
+                font-size: 20px;
+            }
+
+            .instrucciones-contenido {
+                font-size: 14px;
+                text-align: left;
+            }
+
+            .footer-franja {
+                padding: 20px 15px;
+            }
+
+            .footer-logo {
+                height: 60px;
+                max-width: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header-vino">
+        <div class="header-container">
+            <div class="header-logos-center">
+                <div style="display: flex; align-items: center; cursor: default;">
+                    <img src="/Logotipos/Gobierno de méxico.png" alt="Gobierno de México" class="logo-header">
+                </div>
+            </div>
+            <nav class="header-links">
+                <a href="admin.html" class="header-link active">Administración</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="admin-container">
+            <div class="admin-header">
+                <h1>Registro de Casos de Fraude</h1>
+                <p>Sistema de administración para asesores - Complete todos los campos requeridos</p>
+            </div>
+
+            <form id="casoForm">
+                <div class="folio-display">
+                    <label>Folio Generado:</label>
+                    <strong id="folioGenerado">Se generará automáticamente</strong>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nombres">NOMBRES *</label>
+                        <input type="text" id="nombres" name="nombres" required placeholder="Ej: Juan Pedro" onblur="validarClienteDuplicado()">
+                        <small id="nombresError" style="color: #dc3545; font-size: 12px; display: none; margin-top: 5px;"></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="apellidos">APELLIDOS *</label>
+                        <input type="text" id="apellidos" name="apellidos" required placeholder="Ej: Pérez López" onblur="validarClienteDuplicado()">
+                        <small id="apellidosError" style="color: #dc3545; font-size: 12px; display: none; margin-top: 5px;"></small>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="tipoFraude">TIPO DE FRAUDE *</label>
+                    <input type="text" id="tipoFraude" name="tipoFraude" required placeholder="Ej: Fraude bancario, Estafa telefónica, etc.">
+                </div>
+
+                <div class="form-group">
+                    <label for="licenciado">LICENCIADO *</label>
+                    <input type="text" id="licenciado" name="licenciado" required placeholder="Nombre del licenciado asignado">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="recuperacion">RECUPERACIÓN ($) *</label>
+                        <input type="number" id="recuperacion" name="recuperacion" required step="0.01" min="0" placeholder="0.00">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="indemnizacion">INDEMNIZACIÓN ($) *</label>
+                        <input type="number" id="indemnizacion" name="indemnizacion" required step="0.01" min="0" placeholder="0.00">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="penalizacion">PENALIZACIÓN ($) *</label>
+                        <input type="number" id="penalizacion" name="penalizacion" required step="0.01" min="0" placeholder="0.00">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="totalEntregar">TOTAL A ENTREGAR ($) *</label>
+                        <input type="number" id="totalEntregar" name="totalEntregar" required step="0.01" min="0" placeholder="0.00">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="pagoPendiente">PAGO PENDIENTE ($) *</label>
+                        <input type="number" id="pagoPendiente" name="pagoPendiente" required step="0.01" min="0" placeholder="0.00">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="conceptoPago">CONCEPTO DE PAGO *</label>
+                        <input type="text" id="conceptoPago" name="conceptoPago" required placeholder="Ej: Honorarios, Gastos administrativos, etc.">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit">Guardar Caso</button>
+
+                <div class="success-message" id="successMessage">
+                    <button class="close-btn" onclick="cerrarMensajeExito()" title="Cerrar mensaje">×</button>
+                    <div style="padding-right: 40px;">
+                        <p style="margin-bottom: 15px; font-size: 18px; font-weight: 600;">✓ Caso registrado exitosamente</p>
+                        <p style="margin-bottom: 10px; font-size: 14px;">Folio generado:</p>
+                        <div class="folio-destacado" id="folioMostrado" onclick="copiarFolio()" title="Haz clic para copiar">-</div>
+                        <p style="margin-top: 10px; font-size: 12px; color: #666;">Haz clic en el folio para copiarlo</p>
+                    </div>
+                </div>
+
+                <div class="error-message" id="errorMessage">
+                    ✗ Error al guardar el caso. Por favor, intenta nuevamente.
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Modal para cliente duplicado -->
+    <div class="modal-overlay" id="modalClienteDuplicado">
+        <div class="modal-cliente-duplicado">
+            <button class="modal-close-btn" onclick="cerrarModalClienteDuplicado()" title="Cerrar">×</button>
+            <h2 class="modal-titulo">⚠️ CLIENTE YA REGISTRADO</h2>
+            <div class="modal-info-item">
+                <div class="modal-info-label">FOLIO DEL CASO:</div>
+                <div class="modal-folio-destacado" id="modalFolioExistente" onclick="copiarFolioModal()" title="Haz clic para copiar">-</div>
+            </div>
+            <div class="modal-info-item">
+                <div class="modal-info-label">LICENCIADO ASIGNADO:</div>
+                <div class="modal-info-value" id="modalLicenciadoExistente">-</div>
+            </div>
+            <p style="text-align: center; margin-top: 20px; color: #666; font-size: 14px;">
+                Este cliente ya tiene un caso registrado en el sistema.
+            </p>
+        </div>
+    </div>
+
+    <!-- Instrucciones del Sistema -->
+    <section class="instrucciones-sistema">
+        <div class="instrucciones-container">
+            <h2 class="instrucciones-titulo">Sistema de Administración para Asesores</h2>
+            <div class="instrucciones-contenido">
+                <p><strong>¿Cómo funciona este sistema?</strong></p>
+                <ul>
+                    <li><strong>Folio único:</strong> Cada caso recibe automáticamente un folio único que identifica el registro de forma exclusiva.</li>
+                    <li><strong>Registro de víctimas:</strong> Complete los campos de <strong>NOMBRES</strong> y <strong>APELLIDOS</strong> de la víctima. El sistema no permite registrar el mismo cliente dos veces.</li>
+                    <li><strong>Información del caso:</strong> Ingrese todos los datos del fraude: tipo, licenciado asignado, montos de recuperación, indemnización, penalización, total a entregar, pago pendiente y concepto de pago.</li>
+                    <li><strong>Validación automática:</strong> El sistema valida que no existan clientes duplicados antes de guardar el caso.</li>
+                    <li><strong>Consulta de folios:</strong> Los clientes pueden consultar su caso ingresando el folio en la página principal del portal.</li>
+                </ul>
+                <p style="margin-top: 20px; text-align: center; font-weight: 600;">
+                    Complete todos los campos requeridos (*) para registrar exitosamente un caso de fraude.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer - Franja café con logotipo -->
+    <footer class="footer-franja">
+        <div class="footer-container">
+            <img src="/Logotipos/Gobierno de méxico.png" alt="Gobierno de México" class="footer-logo">
+        </div>
+    </footer>
+
+    <script src="/admin.js"></script>
+</body>
+</html>
+
