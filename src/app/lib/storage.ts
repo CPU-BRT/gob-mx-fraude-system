@@ -1,5 +1,5 @@
 import { db } from './firebase';
-import { collection, addDoc, getDocs, query, where, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, where, doc, updateDoc, deleteDoc, type DocumentData } from 'firebase/firestore';
 import { sanitizeString, sanitizeForDatabase, validateCasoData } from './security';
 
 export interface Cobro {
@@ -54,6 +54,31 @@ export interface Caso {
 
 const COLLECTION_NAME = 'casos';
 
+function reconstruirCaso(docData: DocumentData): Caso {
+  return {
+    folio: docData.folio || '',
+    cliente: docData.cliente || '',
+    nombres: docData.nombres || '',
+    apellidos: docData.apellidos || '',
+    tipoFraude: docData.tipoFraude || '',
+    licenciado: docData.licenciado || '',
+    recuperacion: docData.recuperacion || 0,
+    indemnizacion: docData.indemnizacion || 0,
+    penalizacion: docData.penalizacion || 0,
+    totalEntregar: docData.totalEntregar || 0,
+    pagoPendiente: docData.pagoPendiente || 0,
+    conceptoPago: docData.conceptoPago || '',
+    fechaCreacion: docData.fechaCreacion || '',
+    cobros: docData.cobros ? [...docData.cobros] : [],
+    numeroCuentaFideicomiso: docData.numeroCuentaFideicomiso || '',
+    claveInterbancaria: docData.claveInterbancaria || '',
+    institucionBancaria: docData.institucionBancaria || '',
+    titularCuenta: docData.titularCuenta || '',
+    conceptosAdicionales: docData.conceptosAdicionales ? [...docData.conceptosAdicionales] : [],
+    claveAcceso: docData.claveAcceso ? { ...docData.claveAcceso } : undefined
+  };
+}
+
 // Generar clave de acceso corta (válida por 6 minutos)
 export function generarClaveAcceso(consecutivoActual: number): ClaveAcceso {
   const nuevoConsecutivo = consecutivoActual + 1;
@@ -77,11 +102,13 @@ export function generarClaveAcceso(consecutivoActual: number): ClaveAcceso {
 
 // Validar si la clave de acceso es válida (no caducada)
 export function validarClaveAcceso(claveAcceso: ClaveAcceso | undefined, claveIngresada: string): { valida: boolean; mensaje: string } {
+  const claveNormalizada = claveIngresada.trim().toUpperCase();
+
   if (!claveAcceso) {
     return { valida: false, mensaje: 'No existe clave de acceso para este folio' };
   }
 
-  if (claveAcceso.clave !== claveIngresada.toUpperCase()) {
+  if (claveAcceso.clave !== claveNormalizada) {
     return { valida: false, mensaje: 'Clave de acceso incorrecta' };
   }
 
@@ -142,6 +169,37 @@ export async function actualizarClaveAcceso(docId: string, claveAcceso: ClaveAcc
   }
 }
 
+// Actualizar la misma clave en todos los documentos que tengan el mismo folio/CURP.
+// Esto corrige clientes duplicados para que admin y página principal usen la misma clave.
+export async function actualizarClaveAccesoPorFolio(folio: string, claveAcceso: ClaveAcceso): Promise<boolean> {
+  try {
+    const folioNormalizado = folio.trim().toUpperCase();
+    const q = query(
+      collection(db, COLLECTION_NAME),
+      where('folio', '==', folioNormalizado)
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      console.warn('⚠️ No se encontraron documentos para actualizar clave:', folioNormalizado);
+      return false;
+    }
+
+    await Promise.all(
+      querySnapshot.docs.map((docSnap) =>
+        updateDoc(doc(db, COLLECTION_NAME, docSnap.id), { claveAcceso })
+      )
+    );
+
+    console.log('✅ Clave de acceso actualizada en documentos:', querySnapshot.size);
+    return true;
+  } catch (error) {
+    console.error('❌ Error al actualizar clave por folio:', error);
+    return false;
+  }
+}
+
 // Obtener el último consecutivo usado
 export async function obtenerUltimoConsecutivo(): Promise<number> {
   try {
@@ -167,59 +225,42 @@ export async function obtenerUltimoConsecutivo(): Promise<number> {
 export async function buscarCasoConClave(folio: string, claveIngresada: string): Promise<{ caso: Caso | null; error: string | null }> {
   try {
     const folioLimpio = folio.trim().toUpperCase();
+    const claveNormalizada = claveIngresada.trim().toUpperCase();
 
     // Validar formato de folio
     if (folioLimpio.length < 3) {
       return { caso: null, error: 'Folio inválido' };
     }
 
-    const casosRef = collection(db, 'casos');
-    const querySnapshot = await getDocs(casosRef);
-
-    let casoEncontrado: Caso | null = null;
+    const q = query(
+      collection(db, COLLECTION_NAME),
+      where('folio', '==', folioLimpio)
+    );
+    const querySnapshot = await getDocs(q);
+    const casosEncontrados: Caso[] = [];
 
     querySnapshot.forEach((docSnap) => {
-      const docData = docSnap.data();
-      if (docData.folio === folioLimpio) {
-        // RECONSTRUIR EL CASO COMPLETO CON TODOS LOS CAMPOS
-        casoEncontrado = {
-          folio: docData.folio || '',
-          cliente: docData.cliente || '',
-          nombres: docData.nombres || '',
-          apellidos: docData.apellidos || '',
-          tipoFraude: docData.tipoFraude || '',
-          licenciado: docData.licenciado || '',
-          recuperacion: docData.recuperacion || 0,
-          indemnizacion: docData.indemnizacion || 0,
-          penalizacion: docData.penalizacion || 0,
-          totalEntregar: docData.totalEntregar || 0,
-          pagoPendiente: docData.pagoPendiente || 0,
-          conceptoPago: docData.conceptoPago || '',
-          fechaCreacion: docData.fechaCreacion || '',
-          // IMPORTANTE: Incluir todos los cobros
-          cobros: docData.cobros ? [...docData.cobros] : [],
-          // Cuenta fideicomiso
-          numeroCuentaFideicomiso: docData.numeroCuentaFideicomiso || '',
-          claveInterbancaria: docData.claveInterbancaria || '',
-          institucionBancaria: docData.institucionBancaria || '',
-          titularCuenta: docData.titularCuenta || '',
-          // Conceptos adicionales
-          conceptosAdicionales: docData.conceptosAdicionales ? [...docData.conceptosAdicionales] : [],
-          // Clave de acceso
-          claveAcceso: docData.claveAcceso ? { ...docData.claveAcceso } : undefined
-        };
-        console.log('📝 Caso encontrado con cobros:', casoEncontrado.cobros?.length || 0);
-        console.log('📝 Datos de cobros:', casoEncontrado.cobros);
-      }
+      casosEncontrados.push(reconstruirCaso(docSnap.data()));
     });
 
-    if (!casoEncontrado) {
+    if (casosEncontrados.length === 0) {
       return { caso: null, error: 'No se encontró ningún caso con ese folio' };
     }
 
+    // Si existen duplicados del mismo CURP, usar el documento que tiene la clave ingresada.
+    // Esto evita tomar un registro viejo sin clave y mostrar "No existe clave..." por error.
+    const casoEncontrado =
+      casosEncontrados.find((caso) => caso.claveAcceso?.clave === claveNormalizada) ||
+      casosEncontrados.find((caso) => caso.claveAcceso) ||
+      casosEncontrados[0];
+
+    console.log('📝 Casos encontrados para folio:', casosEncontrados.length);
+    console.log('📝 Caso seleccionado con cobros:', casoEncontrado.cobros?.length || 0);
+    console.log('📝 Datos de cobros:', casoEncontrado.cobros);
+
     // Validar clave de acceso
     const caso: Caso = casoEncontrado;
-    const validacion = validarClaveAcceso(caso.claveAcceso, claveIngresada);
+    const validacion = validarClaveAcceso(caso.claveAcceso, claveNormalizada);
 
     if (!validacion.valida) {
       return { caso: null, error: validacion.mensaje };
@@ -339,6 +380,56 @@ export async function actualizarCaso(casoId: string, casoActualizado: Caso): Pro
     console.log('✅ Caso actualizado en Firebase:', casoSeguro.folio, 'ID:', casoId);
   } catch (error) {
     console.error('❌ Error al actualizar caso en Firebase:', error);
+    throw error;
+  }
+}
+
+// Actualizar todos los documentos que comparten el mismo folio/CURP.
+// Evita que un duplicado muestre información vieja en la página principal.
+export async function actualizarCasoPorFolio(folio: string, casoActualizado: Caso): Promise<number> {
+  try {
+    // 🔒 VALIDACIÓN DE SEGURIDAD
+    const validacion = validateCasoData(casoActualizado);
+    if (!validacion.valid) {
+      console.error('❌ Validación fallida:', validacion.errors);
+      throw new Error(`Datos inválidos: ${validacion.errors.join(', ')}`);
+    }
+
+    // 🔒 SANITIZAR DATOS
+    const casoSeguro: Caso = {
+      ...casoActualizado,
+      folio: sanitizeForDatabase(casoActualizado.folio.toUpperCase()),
+      cliente: sanitizeString(casoActualizado.cliente),
+      nombres: sanitizeString(casoActualizado.nombres),
+      apellidos: sanitizeString(casoActualizado.apellidos),
+      tipoFraude: sanitizeString(casoActualizado.tipoFraude),
+      licenciado: sanitizeString(casoActualizado.licenciado),
+      conceptoPago: sanitizeString(casoActualizado.conceptoPago),
+    };
+
+    const folioNormalizado = folio.trim().toUpperCase();
+    const q = query(
+      collection(db, COLLECTION_NAME),
+      where('folio', '==', folioNormalizado)
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      console.warn('⚠️ No se encontraron documentos para actualizar caso:', folioNormalizado);
+      return 0;
+    }
+
+    await Promise.all(
+      querySnapshot.docs.map((docSnap) =>
+        updateDoc(doc(db, COLLECTION_NAME, docSnap.id), { ...casoSeguro })
+      )
+    );
+
+    console.log('✅ Caso actualizado en documentos:', querySnapshot.size);
+    return querySnapshot.size;
+  } catch (error) {
+    console.error('❌ Error al actualizar caso por folio:', error);
     throw error;
   }
 }

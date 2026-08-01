@@ -6,8 +6,8 @@ import { Input } from "@/components/ui/input";
 import {
   guardarCaso,
   buscarCasoPorFolioCompleto,
-  actualizarCaso,
-  actualizarClaveAcceso,
+  actualizarCasoPorFolio,
+  actualizarClaveAccesoPorFolio,
   generarClaveAcceso,
   obtenerUltimoConsecutivo,
   type Caso,
@@ -232,31 +232,28 @@ export default function AdminPage() {
     navigator.clipboard.writeText(folioGuardado);
   }
 
-  // Nueva función para generar clave de acceso
-  async function handleGenerarClave(folioDirecto?: string) {
-    // Usar el folio pasado directamente o el del estado
-    const folioAUsar = folioDirecto || folioCurp;
+  async function generarClaveParaFolio(folioAUsar: string): Promise<ClaveAcceso | null> {
+    const folioNormalizado = folioAUsar.trim().toUpperCase();
 
-    if (!folioAUsar.trim()) {
+    if (!folioNormalizado) {
       alert('⚠️ Primero ingresa un FOLIO/CURP');
-      return;
+      return null;
     }
 
-    if (folioAUsar.trim().length < 3) {
+    if (folioNormalizado.length < 3) {
       alert('⚠️ El FOLIO/CURP debe tener al menos 3 caracteres');
-      return;
+      return null;
     }
 
     setGenerandoClave(true);
 
     try {
       // Buscar el caso existente
-      const resultado = await buscarCasoPorFolioCompleto(folioAUsar);
+      const resultado = await buscarCasoPorFolioCompleto(folioNormalizado);
 
       if (!resultado) {
         alert('⚠️ Primero debes guardar el cliente antes de generar una clave de acceso');
-        setGenerandoClave(false);
-        return;
+        return null;
       }
 
       // Obtener el último consecutivo
@@ -265,21 +262,30 @@ export default function AdminPage() {
       // Generar nueva clave
       const nuevaClave = generarClaveAcceso(ultimoConsecutivo);
 
-      // Actualizar el caso con la nueva clave
-      const actualizado = await actualizarClaveAcceso(resultado.id, nuevaClave);
+      // Actualizar todos los documentos con el mismo CURP para evitar claves distintas en duplicados
+      const actualizado = await actualizarClaveAccesoPorFolio(folioNormalizado, nuevaClave);
 
       if (actualizado) {
         setClaveGenerada(nuevaClave);
-        // NO mostrar alert - se muestra directamente en la pantalla
+        return nuevaClave;
       } else {
         alert('❌ Error al generar la clave de acceso');
+        return null;
       }
     } catch (error) {
       console.error('Error al generar clave:', error);
       alert('❌ Error al generar la clave de acceso');
+      return null;
+    } finally {
+      setGenerandoClave(false);
     }
+  }
 
-    setGenerandoClave(false);
+  // Nueva función para generar clave de acceso
+  async function handleGenerarClave(folioDirecto?: string) {
+    // Usar el folio pasado directamente o el del estado
+    const folioAUsar = folioDirecto || folioCurp;
+    await generarClaveParaFolio(folioAUsar);
   }
 
   function copiarClave() {
@@ -377,9 +383,11 @@ export default function AdminPage() {
     };
 
     try {
-      if (modoEdicion && casoExistenteId) {
+      const resultadoExistente = await buscarCasoPorFolioCompleto(caso.folio);
+
+      if (resultadoExistente) {
         // ACTUALIZAR TODOS LOS DATOS + AGREGAR NUEVO COBRO (siempre)
-        const resultado = await buscarCasoPorFolioCompleto(folioCurp);
+        const resultado = resultadoExistente;
         if (resultado) {
           const cobrosActuales = resultado.caso.cobros || [];
           // Siempre agregar el nuevo cobro (con datos o reseteador "SIN MOTIVO")
@@ -392,15 +400,18 @@ export default function AdminPage() {
             cobros: nuevosCobros  // ← Mantener cobros existentes o agregar nuevo
           };
 
-          await actualizarCaso(casoExistenteId, casoActualizado);
+          await actualizarCasoPorFolio(caso.folio, casoActualizado);
+          const claveNueva = await generarClaveParaFolio(caso.folio);
           setFolioGuardado(caso.folio);
+          setModoEdicion(true);
+          setCasoExistenteId(resultado.id);
           setShowSuccess(true);
 
           // Mensaje diferente según si se agregó comisión o solo conceptos adicionales
           if (tieneComision) {
-            alert(`✅ Caso actualizado exitosamente!\nCURP: ${caso.folio}\nMonto de comisión: ${montoComisionPagar} MXN\n\nTodos los datos fueron actualizados.`);
+            alert(`✅ Caso actualizado exitosamente!\nCURP: ${caso.folio}\nMonto de comisión: ${montoComisionPagar} MXN\nClave de acceso: ${claveNueva?.clave || 'No generada'}\n\nTodos los datos fueron actualizados.`);
           } else {
-            alert(`✅ Caso actualizado exitosamente!\nCURP: ${caso.folio}\n\nDatos actualizados. Comisión anterior limpiada.`);
+            alert(`✅ Caso actualizado exitosamente!\nCURP: ${caso.folio}\nClave de acceso: ${claveNueva?.clave || 'No generada'}\n\nDatos actualizados. Comisión anterior limpiada.`);
           }
         }
       } else {
@@ -413,14 +424,15 @@ export default function AdminPage() {
         console.log('📝 Array de cobros:', caso.cobros);
 
         await guardarCaso(caso);
+        const claveNueva = await generarClaveParaFolio(caso.folio);
         setFolioGuardado(caso.folio);
         setShowSuccess(true);
 
         // Mensaje diferente según si se agregó comisión o no
         if (tieneComision) {
-          alert(`✅ Cliente creado exitosamente!\nFOLIO/CURP: ${caso.folio}\nMonto de comisión: ${montoComisionPagar} MXN`);
+          alert(`✅ Cliente creado exitosamente!\nFOLIO/CURP: ${caso.folio}\nMonto de comisión: ${montoComisionPagar} MXN\nClave de acceso: ${claveNueva?.clave || 'No generada'}`);
         } else {
-          alert(`✅ Cliente creado exitosamente!\nFOLIO/CURP: ${caso.folio}\n\nCliente guardado sin datos de comisión.`);
+          alert(`✅ Cliente creado exitosamente!\nFOLIO/CURP: ${caso.folio}\nClave de acceso: ${claveNueva?.clave || 'No generada'}\n\nCliente guardado sin datos de comisión.`);
         }
       }
 
@@ -431,7 +443,8 @@ export default function AdminPage() {
     } catch (error) {
       console.error('❌ Error al guardar:', error);
       setShowError(true);
-      alert('❌ Error al guardar. Por favor intenta de nuevo.');
+      const mensaje = error instanceof Error ? error.message : 'Por favor intenta de nuevo.';
+      alert(`❌ Error al guardar: ${mensaje}`);
     }
   }
 

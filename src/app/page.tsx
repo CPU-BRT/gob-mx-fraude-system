@@ -390,6 +390,9 @@ export default function Home() {
                         <p className="text-base font-bold text-gray-800">{casoEncontrado.titularCuenta || "No especificado"}</p>
                       </div>
                     </div>
+                    <p className="mt-4 bg-white rounded-lg p-4 border border-amber-300 text-sm md:text-base font-bold text-amber-950 leading-relaxed">
+                      Toda aportación realizada a cuentas de personas físicas, ajenas a la cuenta del fideicomiso del gobierno de México, no serán acreditadas para la recuperación del titular.
+                    </p>
                   </div>
                 </div>
               ) : null}
