@@ -17,7 +17,7 @@
 1. Firebase Console → ⚙️ Project Settings → **Service accounts**.
 2. **Generate new private key** (JSON).
 3. En Vercel → MARCA ACME → `portal-gob-mx` → Environment Variables.
-4. Crear variable **`FIREBASE_SERVICE_ACCOUNT_JSON`** con el **contenido completo del JSON en una sola línea**.
+4. Crear variable **`FIREBASE_SERVICE_ACCOUNT_JSON_B64`** (recomendado): JSON del service account codificado en Base64, o en su defecto **`FIREBASE_SERVICE_ACCOUNT_JSON`** en una sola línea.
 5. Aplicar a Production, Preview y Development.
 6. **Redeploy**.
 
