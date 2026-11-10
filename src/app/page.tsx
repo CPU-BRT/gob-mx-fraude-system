@@ -3,7 +3,6 @@
 import { Search, Menu, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { buscarCasoConClave } from "./lib/storage";
 
 export default function Home() {
   const [busqueda, setBusqueda] = useState("");
@@ -68,7 +67,12 @@ export default function Home() {
 
     try {
       // Buscar con validación de clave de acceso
-      const resultado = await buscarCasoConClave(curpIngresado, claveIngresada);
+      const response = await fetch('/api/caso/consulta', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ folio: curpIngresado, clave: claveIngresada }),
+      });
+      const resultado = await response.json();
 
       if (resultado.error) {
         setError(resultado.error);

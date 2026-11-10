@@ -8,12 +8,10 @@ import {
   buscarCasoPorFolioCompleto,
   actualizarCasoPorFolio,
   actualizarClaveAccesoPorFolio,
-  generarClaveAcceso,
   obtenerUltimoConsecutivo,
-  type Caso,
-  type Cobro,
-  type ClaveAcceso
-} from "../lib/storage";
+} from "../lib/admin-data-api";
+import { generarClaveAcceso } from "../lib/caso-utils";
+import type { Caso, Cobro, ClaveAcceso } from "../lib/caso-model";
 
 const MOTIVOS_COMISION = [
   "SIN MOTIVO",

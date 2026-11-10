@@ -54,7 +54,7 @@ export interface Caso {
 
 const COLLECTION_NAME = 'casos';
 
-function reconstruirCaso(docData: DocumentData): Caso {
+export function reconstruirCaso(docData: DocumentData): Caso {
   return {
     folio: docData.folio || '',
     cliente: docData.cliente || '',
